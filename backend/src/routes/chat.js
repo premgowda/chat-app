@@ -97,11 +97,14 @@ export default async function chatRoutes(fastify) {
       if (!aiResponse.ok) return reply.code(502).send({ error: 'AI service error' });
 
       // Stream SSE passthrough
+      const origin = request.headers.origin || '';
       reply.raw.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
         'X-Session-Id': sessionKey,
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Credentials': 'true',
       });
 
       const reader = aiResponse.body.getReader();
