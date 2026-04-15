@@ -1,12 +1,12 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h1>Asbury</h1>
+      <h1>ThriveWell</h1>
       <p class="subtitle">Admin Dashboard Login</p>
       <div v-if="error" class="error-msg">{{ error }}</div>
       <div class="field">
         <label>Email</label>
-        <input v-model="email" type="email" placeholder="admin@asbury.com" @keyup.enter="login" />
+        <input v-model="email" type="email" placeholder="admin@thrivewell.com" @keyup.enter="login" />
       </div>
       <div class="field">
         <label>Password</label>

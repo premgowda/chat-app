@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <nav v-if="isAdminPage" class="navbar">
-      <router-link to="/admin/home" class="logo">Asbury Admin</router-link>
+      <router-link to="/admin/home" class="logo">ThriveWell Admin</router-link>
       <button class="btn-logout" @click="logout">Logout</button>
     </nav>
     <router-view />

@@ -72,7 +72,7 @@ export default async function adminRoutes(fastify) {
     );
 
     const [rows] = await fastify.db.query(
-      `SELECT s.id, s.session_key, s.status, s.outcome, s.topic, s.escalated_to_hr, s.created_at,
+      `SELECT s.id, s.session_key, s.status, s.outcome, s.topic, s.form_campus_name, s.chat_campus_name, s.escalated_to_hr, s.created_at,
               u.email, u.display_name,
               COUNT(m.id) AS message_count,
               SUM(m.is_negative) AS negative_messages
@@ -92,7 +92,7 @@ export default async function adminRoutes(fastify) {
   // GET /api/admin/users - all users
   fastify.get('/api/admin/users', { preHandler: [fastify.requireAdmin] }, async () => {
     const [rows] = await fastify.db.query(`
-      SELECT u.id, u.email, u.display_name, u.phone, u.role, u.is_active, u.created_at,
+      SELECT u.id, u.email, u.display_name, u.campus, u.role, u.is_active, u.created_at,
              COUNT(DISTINCT s.id) AS session_count
       FROM users u
       LEFT JOIN sessions s ON s.user_id = u.id
@@ -129,6 +129,55 @@ export default async function adminRoutes(fastify) {
       FROM sessions
       GROUP BY topic
       ORDER BY total DESC
+    `);
+    return rows;
+  });
+
+  // GET /api/admin/stats/hourly - messages grouped by hour of day
+  fastify.get('/api/admin/stats/hourly', { preHandler: [fastify.requireAdmin] }, async () => {
+    const [rows] = await fastify.db.query(`
+      SELECT 
+        HOUR(created_at) AS hour,
+        COUNT(*) AS count
+      FROM messages
+      WHERE sender = 'user'
+      GROUP BY HOUR(created_at)
+      ORDER BY hour ASC
+    `);
+    // Fill missing hours with 0
+    const hourMap = Object.fromEntries(rows.map(r => [r.hour, r.count]));
+    return Array.from({ length: 24 }, (_, i) => ({ hour: i, count: hourMap[i] || 0 }));
+  });
+
+  // GET /api/admin/stats/users-top - top 10 users by session count
+  fastify.get('/api/admin/stats/users-top', { preHandler: [fastify.requireAdmin] }, async () => {
+    const [rows] = await fastify.db.query(`
+      SELECT u.display_name, u.email, COUNT(s.id) AS sessions,
+             SUM(s.outcome = 'answered') AS answered,
+             SUM(s.outcome = 'unanswered') AS unanswered
+      FROM users u
+      JOIN sessions s ON s.user_id = u.id
+      WHERE u.role = 'user'
+      GROUP BY u.id
+      ORDER BY sessions DESC
+      LIMIT 10
+    `);
+    return rows;
+  });
+
+  // GET /api/admin/stats/weekly - weekly aggregates (last 12 weeks)
+  fastify.get('/api/admin/stats/weekly', { preHandler: [fastify.requireAdmin] }, async () => {
+    const [rows] = await fastify.db.query(`
+      SELECT 
+        YEARWEEK(created_at, 1) AS week,
+        MIN(DATE(created_at)) AS week_start,
+        COUNT(*) AS total,
+        SUM(outcome = 'answered') AS answered,
+        SUM(outcome = 'unanswered') AS unanswered
+      FROM sessions
+      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 12 WEEK)
+      GROUP BY YEARWEEK(created_at, 1)
+      ORDER BY week ASC
     `);
     return rows;
   });

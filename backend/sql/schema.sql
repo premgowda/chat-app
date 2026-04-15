@@ -6,7 +6,7 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
   display_name VARCHAR(100) NOT NULL,
-  phone VARCHAR(30) DEFAULT NULL,
+  campus VARCHAR(100) DEFAULT NULL,
   role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -22,6 +22,8 @@ CREATE TABLE sessions (
   status ENUM('active', 'resolved', 'escalated') NOT NULL DEFAULT 'active',
   outcome ENUM('answered', 'unanswered', 'pending') NOT NULL DEFAULT 'pending',
   topic VARCHAR(100) DEFAULT NULL,
+  form_campus_name VARCHAR(100) DEFAULT NULL,
+  chat_campus_name VARCHAR(100) DEFAULT NULL,
   escalated_to_hr BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -50,31 +52,31 @@ CREATE TABLE messages (
 -- SAMPLE DATA
 -- ============================================
 -- Admin password: admin123 (bcrypt hash)
-INSERT INTO users (email, password_hash, display_name, phone, role) VALUES
-('admin@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Admin User',     NULL,           'admin'),
-('hr@thrivewell.com',      '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'HR Manager',     NULL,           'admin'),
-('alice@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Alice Johnson',  '9876543210',   'user'),
-('bob@thrivewell.com',     '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Bob Smith',      '9876543211',   'user'),
-('carol@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Carol Williams', NULL,           'user'),
-('dave@thrivewell.com',    '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Dave Brown',     '9876543213',   'user'),
-('eve@thrivewell.com',     '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Eve Davis',      NULL,           'user');
+INSERT INTO users (email, password_hash, display_name, campus, role) VALUES
+('admin@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Admin User',     NULL,            'admin'),
+('hr@thrivewell.com',      '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'HR Manager',     NULL,            'admin'),
+('alice@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Alice Johnson',  'Bethany Village',  'user'),
+('bob@thrivewell.com',     '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Bob Smith',      'Spring Hills',     'user'),
+('carol@thrivewell.com',   '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Carol Williams', 'Bethany Village',  'user'),
+('dave@thrivewell.com',    '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Dave Brown',     'Spring Hills',     'user'),
+('eve@thrivewell.com',     '$2b$10$8KzaNdKIMyOkASCymcbwce0XR1X.qGMjFBV.bEz4E4VXMhDPJKFMG', 'Eve Davis',      'Bethany Village',  'user');
 
-INSERT INTO sessions (session_key, user_id, status, outcome, topic, escalated_to_hr, created_at) VALUES
-('sess_001', 3, 'resolved',  'answered',   'Leave Policy',        FALSE, '2026-03-15 09:10:00'),
-('sess_002', 3, 'resolved',  'answered',   'Health Insurance',    FALSE, '2026-03-16 14:22:00'),
-('sess_003', 4, 'escalated', 'unanswered', 'Harassment Complaint', TRUE,  '2026-03-17 10:05:00'),
-('sess_004', 4, 'resolved',  'answered',   'Work From Home',      FALSE, '2026-03-18 11:30:00'),
-('sess_005', 5, 'escalated', 'unanswered', 'Payroll',             TRUE,  '2026-03-20 08:45:00'),
-('sess_006', 5, 'resolved',  'answered',   'Onboarding',          FALSE, '2026-03-21 16:00:00'),
-('sess_007', 5, 'resolved',  'answered',   'Expense Policy',      FALSE, '2026-03-22 09:15:00'),
-('sess_008', 6, 'escalated', 'unanswered', 'Sabbatical',          TRUE,  '2026-03-25 13:10:00'),
-('sess_009', 6, 'resolved',  'answered',   'IT Support',          FALSE, '2026-03-26 10:00:00'),
-('sess_010', 7, 'resolved',  'answered',   'Dress Code',          FALSE, '2026-03-28 15:30:00'),
-('sess_011', 7, 'escalated', 'unanswered', 'Promotions',          TRUE,  '2026-03-30 11:20:00'),
-('sess_012', 3, 'active',    'pending',    'Referral Program',    FALSE, '2026-04-01 09:00:00'),
-('sess_013', 4, 'resolved',  'answered',   'Leave Policy',        FALSE, '2026-04-02 14:15:00'),
-('sess_014', 6, 'resolved',  'answered',   'Resignation Policy',  FALSE, '2026-04-03 10:45:00'),
-('sess_015', 7, 'escalated', 'unanswered', 'Grievance',           TRUE,  '2026-04-04 16:30:00');
+INSERT INTO sessions (session_key, user_id, status, outcome, topic, form_campus_name, chat_campus_name, escalated_to_hr, created_at) VALUES
+('sess_001', 3, 'resolved',  'answered',   'Leave Policy',        'Bethany Village', NULL,              FALSE, '2026-03-15 09:10:00'),
+('sess_002', 3, 'resolved',  'answered',   'Health Insurance',    'Bethany Village', NULL,              FALSE, '2026-03-16 14:22:00'),
+('sess_003', 4, 'escalated', 'unanswered', 'Harassment Complaint','Spring Hills',    NULL,              TRUE,  '2026-03-17 10:05:00'),
+('sess_004', 4, 'resolved',  'answered',   'Work From Home',      'Spring Hills',    NULL,              FALSE, '2026-03-18 11:30:00'),
+('sess_005', 5, 'escalated', 'unanswered', 'Payroll',             'Bethany Village', NULL,              TRUE,  '2026-03-20 08:45:00'),
+('sess_006', 5, 'resolved',  'answered',   'Onboarding',          'Bethany Village', NULL,              FALSE, '2026-03-21 16:00:00'),
+('sess_007', 5, 'resolved',  'answered',   'Expense Policy',      'Spring Hills',    NULL,              FALSE, '2026-03-22 09:15:00'),
+('sess_008', 6, 'escalated', 'unanswered', 'Sabbatical',          'Spring Hills',    NULL,              TRUE,  '2026-03-25 13:10:00'),
+('sess_009', 6, 'resolved',  'answered',   'IT Support',          'Bethany Village', 'Bethany Village', FALSE, '2026-03-26 10:00:00'),
+('sess_010', 7, 'resolved',  'answered',   'Dress Code',          'Spring Hills',    NULL,              FALSE, '2026-03-28 15:30:00'),
+('sess_011', 7, 'escalated', 'unanswered', 'Promotions',          'Bethany Village', NULL,              TRUE,  '2026-03-30 11:20:00'),
+('sess_012', 3, 'active',    'pending',    'Referral Program',    'Bethany Village', NULL,              FALSE, '2026-04-01 09:00:00'),
+('sess_013', 4, 'resolved',  'answered',   'Leave Policy',        'Spring Hills',    'Spring Hills',    FALSE, '2026-04-02 14:15:00'),
+('sess_014', 6, 'resolved',  'answered',   'Resignation Policy',  'Bethany Village', NULL,              FALSE, '2026-04-03 10:45:00'),
+('sess_015', 7, 'escalated', 'unanswered', 'Grievance',           'Spring Hills',    NULL,              TRUE,  '2026-04-04 16:30:00');
 
 INSERT INTO messages (session_id, sender, content, is_negative, created_at) VALUES
 (1, 'user', 'What is our annual leave policy?', FALSE, '2026-03-15 09:10:00'),

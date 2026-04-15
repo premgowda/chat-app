@@ -1,6 +1,7 @@
 // Phrases that indicate the bot couldn't answer
 const NEGATIVE_PATTERNS = [
   /i don'?t have/i,
+  /i don'?t currently have/i,
   /i did not understand/i,
   /i'?m not sure/i,
   /i don'?t know/i,
