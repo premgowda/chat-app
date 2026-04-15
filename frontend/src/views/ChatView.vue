@@ -102,6 +102,7 @@
 
 <script setup>
 import { ref, nextTick, onMounted } from 'vue';
+import { API_BASE } from '../config.js';
 
 const aiAvatarUrl = 'https://res.cloudinary.com/dj7vfd5hv/image/upload/e_enhance/Sophie_udkp0r.png';
 const userAvatarUrl = 'https://res.cloudinary.com/dj7vfd5hv/image/upload/e_enhance/Asbury_Logo_nmvisg.jpg';
@@ -156,7 +157,7 @@ function submitForm() {
   sessionStorage.setItem('chatbot_session_id', sessionId);
 
   // Register user in backend
-  fetch('/api/chat/register', {
+  fetch(`${API_BASE}/api/chat/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(form.value),
@@ -229,7 +230,7 @@ async function send() {
   await scrollBottom();
 
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -375,6 +376,7 @@ async function send() {
 
 .chat-messages {
   flex: 1; overflow-y: auto; padding: 10px; min-height: 0;
+  display: flex; flex-direction: column;
   scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.2) transparent;
   -webkit-overflow-scrolling: touch;
 }

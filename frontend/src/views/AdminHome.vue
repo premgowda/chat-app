@@ -114,6 +114,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { API_BASE } from '../config.js';
 
 const token = localStorage.getItem('admin_token');
 const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
@@ -134,7 +135,7 @@ function topicRate(t) {
 }
 
 async function api(url) {
-  const res = await fetch(url, { headers });
+  const res = await fetch(`${API_BASE}${url}`, { headers });
   if (res.status === 401) { localStorage.removeItem('admin_token'); window.location.href = '/admin/login'; }
   return res.json();
 }

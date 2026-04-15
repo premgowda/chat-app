@@ -1,12 +1,12 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h1>ThriveWell</h1>
+      <h1>Asbury</h1>
       <p class="subtitle">Admin Dashboard Login</p>
       <div v-if="error" class="error-msg">{{ error }}</div>
       <div class="field">
         <label>Email</label>
-        <input v-model="email" type="email" placeholder="admin@thrivewell.com" @keyup.enter="login" />
+        <input v-model="email" type="email" placeholder="admin@asbury.com" @keyup.enter="login" />
       </div>
       <div class="field">
         <label>Password</label>
@@ -22,6 +22,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { API_BASE } from '../config.js';
 
 const router = useRouter();
 const email = ref('');
@@ -33,7 +34,7 @@ async function login() {
   error.value = '';
   loading.value = true;
   try {
-    const res = await fetch('/api/admin/login', {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value, password: password.value }),
